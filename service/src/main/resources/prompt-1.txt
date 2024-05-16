@@ -1,0 +1,4 @@
+Analyze the provided Java code for potential optimizations in time and space complexity.
+Offer suggestions for improvement e.g., consider using data structures with faster lookups or algorithms with lower Big O notation if applicable.
+If no common optimizations are found, provide encouraging feedback.
+Keep your response concise (around 50 words). Focus on guidance, not code solutions.

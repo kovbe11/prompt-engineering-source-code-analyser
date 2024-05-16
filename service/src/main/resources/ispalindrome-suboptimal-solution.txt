@@ -1,0 +1,22 @@
+public boolean isPalindrome(String s) {
+  StringBuilder sb = new StringBuilder(s.toLowerCase());
+  int idx = 0;
+  // remove non-letter character
+  while (idx < sb.length()) {
+    char ch = sb.charAt(idx);
+    if (Character.isLetterOrDigit(ch)) {
+      idx += 1;
+    } else { // not letter
+      sb.deleteCharAt(idx);
+    }
+  }
+  int n = sb.length(); // update length
+  // check
+  for (int i = 0; i < n / 2; ++i) { // right-leaning
+    int j = n - i - 1;
+    if (sb.charAt(i) != sb.charAt(j)) {
+      return false;
+    }
+  }
+  return true;
+}
