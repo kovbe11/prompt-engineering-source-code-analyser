@@ -4,7 +4,9 @@ This project is aiming to provide feedback on common code interview specific pro
 
 ## Getting Started
 - use your gpt api key by setting OPENAI_KEY environment variable
+- start the postgres in the docker compose file
 - uncomment the init line in ServiceApplication.java to initialize the vector database with the book
+- comment the init line again, to avoid reinitializing the database every time the app starts
 - change the resource paths to change prompts / problems / solutions
 
 ## Intended usage

@@ -35,8 +35,9 @@ public class ServiceApplication {
     }
 
     @Bean
-    VectorStore vectorStore(EmbeddingClient ec,
-                            JdbcTemplate t) {
+    VectorStore vectorStore(
+            EmbeddingClient ec, JdbcTemplate t
+    ) {
         return new PgVectorStore(t, ec);
     }
 
@@ -45,17 +46,13 @@ public class ServiceApplication {
         return new TokenTextSplitter();
     }
 
-    static void init(VectorStore vectorStore, JdbcTemplate template, Resource pdfResource)
-            throws Exception {
+    static void init(VectorStore vectorStore, JdbcTemplate template, Resource pdfResource) throws Exception {
 
         template.update("delete from vector_store");
 
         var config = PdfDocumentReaderConfig.builder()
-                .withPageExtractedTextFormatter(new ExtractedTextFormatter.Builder()
-                                                        .withNumberOfBottomTextLinesToDelete(1)
-                                                        .withNumberOfTopTextLinesToDelete(1)
-                        .withNumberOfTopPagesToSkipBeforeDelete(14)
-                        .build())
+                .withPageExtractedTextFormatter(new ExtractedTextFormatter.Builder().withNumberOfBottomTextLinesToDelete(
+                        1).withNumberOfTopTextLinesToDelete(1).withNumberOfTopPagesToSkipBeforeDelete(14).build())
                 .withPagesPerDocument(5)
                 .build();
 
@@ -71,10 +68,10 @@ public class ServiceApplication {
             VectorStore vectorStore,
             JdbcTemplate jdbcTemplate,
             @Value("classpath:coding-interview-book.pdf") Resource resource,
-            @Value("classpath:intersection-problem.txt") Resource problemResource,
-            @Value("classpath:intersect-n2-solution.txt") Resource solutionResource,
+            @Value("classpath:valid-brackets-problem.txt") Resource problemResource,
+            @Value("classpath:valid-brackets-stack.txt") Resource solutionResource,
             @Value("classpath:prompt-1.txt") Resource promptResource
-            ) {
+    ) {
         return args -> {
             //init(vectorStore, jdbcTemplate, resource);
             var problem = new String(problemResource.getInputStream().readAllBytes());
@@ -95,10 +92,10 @@ class Chatbot {
 
     private final String template = """
             {prompt}
-            
+                        
             Use the information from the PROBLEM section to understand the specific problem the provided code is solving.
             Use the information from the TIPS section to help guide your response. Those tips are from a book on coding interviews.
-            
+                        
             PROBLEM:
             {problem}
             ----------------
@@ -116,16 +113,16 @@ class Chatbot {
 
     public String chat(String providedCode, String problem, String prompt) {
         var listOfSimilarDocuments = this.vectorStore.similaritySearch(problem);
-        var tips = listOfSimilarDocuments
-                .stream()
+        var tips = listOfSimilarDocuments.stream()
                 .map(Document::getContent)
                 .collect(Collectors.joining(System.lineSeparator()));
-//        log.info("Tips: {}", tips);
+        //        log.info("Tips: {}", tips);
         var systemMessage = new SystemPromptTemplate(this.template)
-                .createMessage(Map.of("prompt", prompt, "tips", tips, "problem", problem));
+                .createMessage(Map.of("prompt", prompt, "tips", tips,"problem", problem));
         var userMessage = new UserMessage(providedCode);
         var fullPrompt = new Prompt(List.of(systemMessage, userMessage));
         var aiResponse = aiClient.call(fullPrompt);
-        return aiResponse.getResult().getOutput().getContent().replace(".", "\n");
+        return aiResponse.getResult().getOutput().getContent().replace(".", ".\n");
     }
+
 }
